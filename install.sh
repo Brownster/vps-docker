@@ -283,8 +283,8 @@ chmod 777  /home/*/*
 #Pull dockerfiles
 cd /home/install
 git clone git@github.com:brownster/nzbget.git
-git clone git@github.com:brownster/sickbeard.git
-git clone git@github.com:brownster/couchpotato.git
+git clone git@github.com:brownster/sonarr.git
+git clone git@github.com:brownster/vps-couchpotato.git couchpotato
 git clone git@github.com:brownster/headphones.git
 
 # Push variables to dockerfiles
