@@ -243,6 +243,7 @@ mkdir /home/downloads/completed/music
 mkdir /home/downloads/completed/games
 mkdir /home/downloads/completed/comics
 mkdir /home/downloads/ongoing
+mkdir /home/downloads/nzbblackhole
 mkdir /home/media/
 mkdir /home/media/films
 mkdir /home/media/tv
