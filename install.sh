@@ -7,109 +7,92 @@ echo                  there are a few deatils to enter....
 
 echo Please enter DYNDNS / noip host name that resolves into your vps ip address:
 read DYNDNS
-sed -i 's/ENV DYNDNS someplace.dydns-remote.com/ENV DYNDNS $DYNDNS' /home/installsh/Dockerfile
 
 echo Please enter a user name for accessing sickbeard, couchpotato etc:
 read WEBUSER
-sed -i 's/ENV WEBUSER webuser/ENV WEBUSER $WEBUSER' /home/installsh/Dockerfile
+
 
 echo Please enter a password for accessing all the web apps sickbeard, couchpotato ect:
 read WEBPASS
-sed -i 's/ENV WEBPASS webpass/ENV WEBPASS $WEBPASS' /home/installsh/Dockerfile
 
-#Please enter a Username for Squid Proxy Server
-SQUIDUSER=squid
+echo Please enter a Username for Squid Proxy Server:
+read SQUIDUSER
 
-#Please enter a password for Squid Proxy Server
-SQUIDPASS=hideme
+echo Please enter a password for Squid Proxy Server:
+read SQUIDPASS
 
-#squid Proxy please enter the port for web access
-SQUIDPORT=7629
+echo squid Proxy please enter the port for web access
+read SQUIDPORT
 
-#SSH please enter the port for access
-SSHPORT=2022
+echo SSH please enter the port for access
+read SSHPORT
 
-#FTP server address eith ip address if you have static address or 
-#dyn dns / no ip account resolving to your home ip if you are dynamic
-FTPHOST=somewhere.dyndns-remote.com
+echo FTP server address either ip address if you have static address or 
+echo dyn dns / no ip account resolving to your home ip if you are dynamic
+read FTPHOST
 
-#ftp user
-FTPUSER=ftpuser
+echo enter the ftp account user name:
+read FTPUSER
 
-#ftp password
-FTPPASS=ftppass
+echo enter the ftp account password:
+read FTPPASS
 
-#film ftp location - relative to ftp home directory
-FILMFTPDIR=films
+echo enter film ftp location - (relative to ftp home directory for ftp user)
+read FILMFTPDIR
 
-#TV ftp location
-TVFTPDIR=tvseries
+echo TV ftp location:
+read TVFTPDIR
 
-#Music ftp location
-MUSICFTPDIR=music
+echo Music ftp location:
+read MUSICFTPDIR
 
-#Books ftp location
-BOOKSFTPDIR=ebooks
+echo Books ftp location:
+read BOOKSFTPDIR
 
-#Books ftp location
-GAMESFTPDIR=games
 
-#Books ftp location
-COMICSFTPDIR=comics
+echo enter dir to mount films ftp location
+read FILMMNTDIR
 
-#games mount location
-GAMESMNTDIR=/home/media/games
+echo tv series mount location
+read TVMNTDIR
 
-#comics mount location
-COMICSMNTDIR=/home/media/comics
+echo music mount location
+read MUSICMNTDIR
 
-#films mount location
-FILMMNTDIR=/home/media/films
-
-#tv series mount location
-TVMNTDIR=/home/media/tv
-
-#music mount location
-MUSICMNTDIR=/home/media/music
-
-#books mount location
-BOOKSMNTDIR=/home/media/books
+echo books mount location
+read BOOKSMNTDIR
 
 
 ## OPTIONAL TO CHANGE BELOW BUT RECOMMENDED ##
 
-#SABNZB now nzbget Please enter the port for web access
-SABPORT=7960
+echo Nzbget Please enter the port for web access
+read SABPORT
 
-#SICKBEARD now sonarr Please enter the port for web access
-SICKPORT=7961
+echo SICKBEARD now sonarr Please enter the port for web access
+read SICKPORT
 
-#COUCHPOTATO Please enter the port for web access
-COUCHPORT=7962
+echo COUCHPOTATO Please enter the port for web access
+read COUCHPORT
 
-#Headphones Please enter the port for web access
-HEADPORT=7963
+echo Headphones Please enter the port for web access
+read HEADPORT
 
-#Lazy Librarian Please enter the port for web access
-BOOKPORT=7964
+echo Lazy Librarian Please enter the port for web access
+read BOOKPORT
 
-#Mylar Please enter the port for web access
-MYLARPORT=7965
+echo Transmission RPC Port (web ui)
+read TRANPORT
 
-#Gamez Please enter the port for web access
-GAMESPORT=7966
+echo Transmission peer port
+read TRANPPORT
 
-#Transmission RPC Port (web ui)
-TRANPORT=7967
+echo Maraschino Web UI port
+read MARAPORT=7979
 
-#Transmission peer port
-TRANPPORT=61724
-
-#Maraschino Web UI port
-MARAPORT=7979
-
-echo #install Docker
+echo thats all i need for now
 sleep 2
+echo installing Docker.......
+sleep 1
 apt-get upadate && apt-get install -y apt-transport-https
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
 apt-get upadte && apt-get install -y lxc-docker
@@ -120,7 +103,7 @@ echo "## installing ufw ##"
 echo "####################"
 sleep 2
 apt-get install ufw -y
-#so docker works with UFW
+#changes to make docker work with UFW
 sed -i 's/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"' /etc/default/ufw
 
 echo "###############################"
