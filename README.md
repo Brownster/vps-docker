@@ -1,5 +1,5 @@
 # vps-docker
-All in one easy VPS setup DOCKERFILE WORK IN PROGRESS NOT WORKING
+All in one easy VPS setup WORK IN PROGRESS NOT WORKING
 
 This bash script attempts to harden your vps and install docker instances of NZBGET, Transmision, Headphones, Sonarr, Couchpotato,and on your vps Fail2ban setup for ssh curlftps for mount points back to your local media squidproxy for anonymous web browsing proxy server useful in the uk and other steps to secure your vps like changing ssh port
 
