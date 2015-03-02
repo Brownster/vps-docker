@@ -78,10 +78,10 @@ BOOKSMNTDIR=/home/media/books
 
 ## OPTIONAL TO CHANGE BELOW BUT RECOMMENDED ##
 
-#SABNZB Please enter the port for web access
+#SABNZB now nzbget Please enter the port for web access
 SABPORT=7960
 
-#SICKBEARD Please enter the port for web access
+#SICKBEARD now sonarr Please enter the port for web access
 SICKPORT=7961
 
 #COUCHPOTATO Please enter the port for web access
@@ -108,7 +108,8 @@ TRANPPORT=61724
 #Maraschino Web UI port
 MARAPORT=7979
 
-
+echo #install Docker
+sleep 2
 apt-get upadate && apt-get install -y apt-transport-https
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
 apt-get upadte && apt-get install -y lxc-docker
@@ -119,6 +120,7 @@ echo "## installing ufw ##"
 echo "####################"
 sleep 2
 apt-get install ufw -y
+#so docker works with UFW
 sed -i 's/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"' /etc/default/ufw
 
 echo "###############################"
@@ -273,10 +275,42 @@ mkdir /home/backups/lazylibrarian
 mkdir /home/backups/sabnzbd
 mkdir /home/backups/comics
 mkdir /home/backups/games
+mkdir /home/install
 chown $username /home/*/*/
 chown $username /home/*/*/*
 chmod 777  /home/*/*
 
-echo review the line(s) below and press enter - end of script
+#Pull dockerfiles
+cd /home/install
+git clone git@github.com:brownster/nzbget.git
+git clone git@github.com:brownster/sickbeard.git
+git clone git@github.com:brownster/couchpotato.git
+git clone git@github.com:brownster/headphones.git
 
-echo sudo docker run –name downloader -v /home/$username/temp:/home/$username/temp -v /home/$username/.pid/:/home/$username/.pid/ -v /home/media/games:/home/media/games –net=host -d -t brownster/vps-docker
+# Push variables to dockerfiles
+sed -i 's/ENV DYNDNS someplace.dydns-remote.com/ENV DYNDNS $DYNDNS' /home/install/couchpotato/Dockerfile
+
+
+
+#Build dockerfiles
+#Build nzbget
+cd /home/install/nzbget
+sudo docker build -t nzbget .
+
+#Build couchpotato
+cd /home/install/couchpotato
+sudo docker build -t couchpotato .
+
+#Build Sonarr
+cd /home/install/sonarr
+sudo docker build -t sonarr .
+
+#Build headphones
+cd /home/install/headphones
+sudo docker build -t headphones .
+
+
+#Run couchpotato Container
+sudo docker run –name couchpotato --restart=always -v /home/media/films:/home/media/films -v /home/backups/couchpotato/:/home/backups/couchpotato/ –net=host -d -t couchpotator
+# Run Sonarr Container
+sudo docker run –name sonarr --restart=always -v /home/media/tv:/home/media/tv -v /home/backups/sonarr/:/home/backups/sonar/ –net=host -d -t sonar
