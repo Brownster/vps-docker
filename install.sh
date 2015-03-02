@@ -5,10 +5,28 @@
 echo           You are about to set the variables for the docker build 
 echo                  there are a few deatils to enter.... 
 
-echo Your docker repo username
+echo Enter your newsgroup server:
+read NEWSSERVER
+
+echo Enter your newsgroup Port:
+read NEWSPORT
+
+echo Enter your newsgroup Username:
+read NEWSUSER
+
+echo Enter your newsgroup server Password:
+read NEWSPASS
+
+echo Enter how many concuurent connections you newsgroup derver allows
+red NEWSCON
+
+echo Does your nesgroup server use ssl? (answer yes or no):
+read NEWSENC
+
+echo Enter Your docker repo username
 read DOCKERREPO
 
-echo Your Docker repo password
+echo Enter Your Docker repo password
 read DOCKERPASS
 
 echo Please enter DYNDNS / noip host name that resolves into your vps ip address:
@@ -95,6 +113,29 @@ read TRANPPORT
 echo Maraschino Web UI port
 read MARAPORT=7979
 
+HOSTIP=`ifconfig|xargs|awk '{print $7}'|sed -e 's/[a-z]*:/''/'
+echo the ip address i will be using is $HOSTIP
+
+echo "we will add a user so we can stop using root, please provide username and password when prompted"
+sleep2
+if [ $(id -u) -eq 0 ]; then
+	read -p "Enter username : " username
+	read -s -p "Enter password : " password
+	egrep "^$username" /etc/passwd >/dev/null
+	if [ $? -eq 0 ]; then
+		echo "$username exists!"
+		exit 1
+	else
+		pass=$(perl -e 'print crypt($ARGV[0], "password")' $password)
+		useradd -m -p $pass $username
+		[ $? -eq 0 ] && echo "User has been added to system!" || echo "Failed to add a user!"
+	fi
+else
+	echo "Only root may add a user to the system"
+	exit 2
+	fi
+
+
 echo thats all i need for now
 sleep 2
 echo installing Docker.......
@@ -103,6 +144,7 @@ apt-get upadate && apt-get install -y apt-transport-https
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
 apt-get upadte && apt-get install -y lxc-docker
 
+HOSTIP=`ifconfig|xargs|awk '{print $7}'|sed -e 's/[a-z]*:/''/'`
 
 echo "####################"
 echo "## installing ufw ##"
@@ -246,8 +288,6 @@ mkdir /home/downloads/completed/tv
 mkdir /home/downloads/completed/films
 mkdir /home/downloads/completed/books
 mkdir /home/downloads/completed/music
-mkdir /home/downloads/completed/games
-mkdir /home/downloads/completed/comics
 mkdir /home/downloads/ongoing
 mkdir /home/downloads/nzb
 mkdir /home/downloads/queue
@@ -256,17 +296,12 @@ mkdir /home/media/
 mkdir /home/media/films
 mkdir /home/media/tv
 mkdir /home/media/music
-mkdir /home/media/books
-mkdir /home/media/games
-mkdir /home/media/comics
 mkdir /home/backups/
 mkdir /home/backups/sickbeard
 mkdir /home/backups/couchpotato
 mkdir /home/backups/headphones
-mkdir /home/backups/lazylibrarian
-mkdir /home/backups/sabnzbd
-mkdir /home/backups/comics
-mkdir /home/backups/games
+mkdir /home/backups/nzbget
+mkdir /home/backups/nzbget/scripts
 mkdir /home/install
 chown $username /home/*/*/
 chown $username /home/*/*/*
@@ -280,7 +315,32 @@ git clone git@github.com:brownster/vps-couchpotato.git
 git clone git@github.com:brownster/vps-headphones.git
 
 # Push variables to dockerfiles
+#couchpotato
 sed -i 's/ENV DYNDNS someplace.dydns-remote.com/ENV DYNDNS $DYNDNS' /home/install/vps-couchpotato/Dockerfile
+
+#Nzbget
+sed -i 's/"MainDir=~/downloads"/"MainDir=/home/downloads"' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/"DestDir=${MainDir}/dst"/"DestDir=/home/downloads/completed"' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/"InterDir=${MainDir}/inter"/"InterDir=/home/downloads/ongoing"' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/"NzbDir=${MainDir}/nzb"/"NzbDir=/home/downloads/nzb"' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/"ScriptDir=${MainDir}/scripts"/"ScriptDir=/home/backups/nzbget/scripts"' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/"QueueDir=${MainDir}/queue"/"QueueDir=/home/downloads/queue"' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/Server1.Host=my.newsserver.com/Server1.Host=$NEWSSERVER' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/Server1.Port=119/Server1.Port=$NEWSPORT' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/Server1.Username=user/Server1.Username=$NEWSUSER' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/Server1.Password=pass/Server1.Password=$NEWSPASS' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/Server1.Encryption=no/Server1.Encryption=$NEWSENC' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/Server1.Connections=4/Server1.Connections=$NEWSCON' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/ControlIP=0.0.0.0/ControlIP=$HOSTIP' /home/install/vps-nzbget/nzbget.conf
+sed -i 's/ControlPort=6789/ControlPort=$SABPORT' /home/install/vps-nzbget/nzbget.conf
+
+#Sonarr
+
+
+
+
+#Headphones
+sed -i 's/ENV username user/ENV username $username' /home/install/vps-headphones/Dockerfile
 
 
 
