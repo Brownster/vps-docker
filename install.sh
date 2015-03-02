@@ -365,8 +365,8 @@ sudo docker build -t $DOCKERREPO/headphones .
 #Run couchpotato Container
 sudo docker run -p $COUCHPORT:$COUCHPORT –name couchpotato --restart=always -v /home/media/films:/home/media/films -v /home/backups/couchpotato/:/home/backups/couchpotato/ -v /etc/localtime:/etc/localtime:ro
 # Run Sonarr Container
-sudo docker run –name sonarr -p $SICKPORT:$SICKPORT --restart=always -v /home/media/tv:/home/media/tv -v /home/backups/sonarr/:/home/backups/sonar/ -v /etc/localtime:/etc/localtime:ro
+sudo docker run -p $SICKPORT:$SICKPORT  --restart=always –name sonarr -v /home/media/tv:/home/media/tv -v /home/backups/sonarr/:/home/backups/sonar/ -v /etc/localtime:/etc/localtime:ro
 # Run NZBGET Container
 sudo docker run -d -p $SABPORT:$SABPORT --restart=always -name nzbget  -v /home/media:/media -v /home/data:/data -v /home/config:/config -v /etc/localtime:/etc/localtime:ro
 #Run Headphones
-sudo docker run -d -p $HEADPORT:$HEADPORT --restart=always -name   -v /home/media:/media -v /home/data:/data -v /home/config:/config -v /etc/localtime:/etc/localtime:ro
+sudo docker run -d -p $HEADPORT:$HEADPORT --restart=always -name headphones  -v /home/media:/media -v /home/data:/data -v /home/config:/config -v /etc/localtime:/etc/localtime:ro
