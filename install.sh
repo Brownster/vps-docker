@@ -5,6 +5,12 @@
 echo           You are about to set the variables for the docker build 
 echo                  there are a few deatils to enter.... 
 
+echo Your docker repo username
+read DOCKERREPO
+
+echo Your Docker repo password
+read DOCKERPASS
+
 echo Please enter DYNDNS / noip host name that resolves into your vps ip address:
 read DYNDNS
 
@@ -243,7 +249,9 @@ mkdir /home/downloads/completed/music
 mkdir /home/downloads/completed/games
 mkdir /home/downloads/completed/comics
 mkdir /home/downloads/ongoing
-mkdir /home/downloads/nzbblackhole
+mkdir /home/downloads/nzb
+mkdir /home/downloads/queue
+mkdir /home/downloads/tmp
 mkdir /home/media/
 mkdir /home/media/films
 mkdir /home/media/tv
@@ -266,35 +274,39 @@ chmod 777  /home/*/*
 
 #Pull dockerfiles
 cd /home/install
-git clone git@github.com:brownster/nzbget.git
-git clone git@github.com:brownster/sonarr.git
-git clone git@github.com:brownster/vps-couchpotato.git couchpotato
-git clone git@github.com:brownster/headphones.git
+git clone git@github.com:brownster/vps-nzbget.git
+git clone git@github.com:brownster/vps-sonarr.git
+git clone git@github.com:brownster/vps-couchpotato.git
+git clone git@github.com:brownster/vps-headphones.git
 
 # Push variables to dockerfiles
-sed -i 's/ENV DYNDNS someplace.dydns-remote.com/ENV DYNDNS $DYNDNS' /home/install/couchpotato/Dockerfile
+sed -i 's/ENV DYNDNS someplace.dydns-remote.com/ENV DYNDNS $DYNDNS' /home/install/vps-couchpotato/Dockerfile
 
 
 
 #Build dockerfiles
 #Build nzbget
-cd /home/install/nzbget
-sudo docker build -t nzbget .
+cd /home/install/vps-nzbget
+sudo docker build -t $DOCKERREPO/nzbget .
 
 #Build couchpotato
 cd /home/install/couchpotato
-sudo docker build -t couchpotato .
+sudo docker build -t $DOCKERREPO/couchpotato .
 
 #Build Sonarr
 cd /home/install/sonarr
-sudo docker build -t sonarr .
+sudo docker build -t $DOCKERREPO/sonarr .
 
 #Build headphones
 cd /home/install/headphones
-sudo docker build -t headphones .
+sudo docker build -t $DOCKERREPO/headphones .
 
 
 #Run couchpotato Container
-sudo docker run –name couchpotato --restart=always -v /home/media/films:/home/media/films -v /home/backups/couchpotato/:/home/backups/couchpotato/ –net=host -d -t couchpotator
+sudo docker run -p $COUCHPORT:$COUCHPORT –name couchpotato --restart=always -v /home/media/films:/home/media/films -v /home/backups/couchpotato/:/home/backups/couchpotato/ -v /etc/localtime:/etc/localtime:ro
 # Run Sonarr Container
-sudo docker run –name sonarr --restart=always -v /home/media/tv:/home/media/tv -v /home/backups/sonarr/:/home/backups/sonar/ –net=host -d -t sonar
+sudo docker run –name sonarr -p $SICKPORT:$SICKPORT --restart=always -v /home/media/tv:/home/media/tv -v /home/backups/sonarr/:/home/backups/sonar/ -v /etc/localtime:/etc/localtime:ro
+# Run NZBGET Container
+sudo docker run -d -p $SABPORT:$SABPORT --restart=always -name nzbget  -v /home/media:/media -v /home/data:/data -v /home/config:/config -v /etc/localtime:/etc/localtime:ro
+#Run Headphones
+sudo docker run -d -p $HEADPORT:$HEADPORT --restart=always -name   -v /home/media:/media -v /home/data:/data -v /home/config:/config -v /etc/localtime:/etc/localtime:ro
